@@ -90,15 +90,38 @@ async function main() {
     .put((req, res) => {
       Article.replaceOne(
         { title: req.params.individualArticle },
-        { title: req.body.title, content: req.body.content },
-        (err) => {
-          if (!err) {
-            res.send("Successfully Updated");
-          } else {
-            res.send(err);
-          }
-        }
-      );
+        { title: req.body.title, content: req.body.content }
+      )
+        .then(() => {
+          res.send("Successfully Updated put");
+        })
+        .catch((err) => {
+          res.send(err);
+        });
+    })
+
+    .patch((req, res) => {
+      Article.updateOne(
+        { title: req.params.individualArticle },
+        { title: req.body.title, content: req.body.content }
+      )
+        .then(() => {
+          res.send("Successfully Updated patch");
+        })
+        .catch((err) => {
+          res.send(err);
+        });
+    })
+
+    .delete((req, res) => {
+      Article.deleteOne({ title: req.params.individualArticle })
+        .then(() => {
+          res.send("Deletion Success");
+        })
+        .catch((err) => {
+          res.send("Error while deleting " + err);
+          console.log("Error while deleting " + err);
+        });
     });
 
   app.listen(3000, () => {
