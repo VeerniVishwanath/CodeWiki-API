@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+const _ = require("lodash");
 
 // Use EJS
 app.set("view engine", "ejs");
@@ -29,8 +30,10 @@ async function main() {
   // Model/Collection of wikiDB
   const Article = new mongoose.model("Article", articleSchema);
 
+// Default Article Route  
   app
     .route("/articles")
+
     .get((req, res) => {
       Article.find({}, (err, result) => {
         if (!err) {
@@ -40,8 +43,9 @@ async function main() {
         }
       });
     })
+
     .post((req, res) => {
-      const title = req.body.title;
+      const title = _.upperFirst(req.body.title);
       const content = req.body.content;
       // Saving to MongoDB
       const newArticle = new Article({
@@ -55,6 +59,7 @@ async function main() {
         }
       });
     })
+
     .delete((req, res) => {
       Article.deleteMany()
         .then(() => {
@@ -63,6 +68,21 @@ async function main() {
         .catch((err) => {
           res.send("Error while deleting route articles :" + err);
         });
+    });
+
+// Individual Articles Route     
+  app
+    .route("/articles/:individualArticle")
+
+    .get((req, res) => {
+      const articleName = _.upperFirst(req.params.individualArticle);
+      Article.findOne({ title: articleName }, (err, result) => {
+        if (!err) {
+          res.send(result);
+        } else {
+          res.send("Error with finding the individual articles " + err);
+        }
+      });
     });
 
   app.listen(3000, () => {
