@@ -30,7 +30,7 @@ async function main() {
   // Model/Collection of wikiDB
   const Article = new mongoose.model("Article", articleSchema);
 
-// Default Article Route  
+  // Default Article Route
   app
     .route("/articles")
 
@@ -70,19 +70,35 @@ async function main() {
         });
     });
 
-// Individual Articles Route     
+  // Individual Articles Route
   app
     .route("/articles/:individualArticle")
 
     .get((req, res) => {
-      const articleName = _.upperFirst(req.params.individualArticle);
-      Article.findOne({ title: articleName }, (err, result) => {
-        if (!err) {
-          res.send(result);
-        } else {
-          res.send("Error with finding the individual articles " + err);
+      Article.findOne(
+        { title: req.params.individualArticle },
+        (err, result) => {
+          if (!err) {
+            res.send(result);
+          } else {
+            res.send("Error with finding the individual articles " + err);
+          }
         }
-      });
+      );
+    })
+
+    .put((req, res) => {
+      Article.replaceOne(
+        { title: req.params.individualArticle },
+        { title: req.body.title, content: req.body.content },
+        (err) => {
+          if (!err) {
+            res.send("Successfully Updated");
+          } else {
+            res.send(err);
+          }
+        }
+      );
     });
 
   app.listen(3000, () => {
